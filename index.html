@@ -257,7 +257,7 @@
 
     if (error) {
       document.getElementById("product-error").textContent =
-        "Couldn't load products. Please try again later.";
+         "Database error: " + error.message;
       return;
     }
 

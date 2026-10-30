@@ -1,0 +1,417 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cosy Craving | Gifts Made With Love</title>
+  <meta name="description" content="Your mood. Your cravings. Your comfort. Discover thoughtful gift boxes at Cosy Craving.">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --pink: #f8dce8;
+      --pink-dark: #bd7897;
+      --lavender: #eee7fa;
+      --brown: #563d48;
+      --cream: #fffaf7;
+      --white: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Georgia, 'Times New Roman', serif;
+      color: var(--brown);
+      background: var(--cream);
+    }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    header {
+      background: var(--white);
+      padding: 16px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #f1e4e9;
+    }
+    .brand { font-size: 27px; font-weight: bold; }
+    .brand span { color: var(--pink-dark); }
+    nav { display: flex; gap: 18px; flex-wrap: wrap; }
+    nav a { color: var(--brown); text-decoration: none; }
+    .hero {
+      text-align: center;
+      padding: 75px 20px;
+      background: linear-gradient(120deg, var(--pink), var(--lavender));
+    }
+    .hero h1 { font-size: clamp(38px, 7vw, 65px); margin: 10px 0; }
+    .hero p { font-size: 18px; }
+    .btn {
+      border: 0;
+      border-radius: 25px;
+      background: var(--pink-dark);
+      color: white;
+      padding: 12px 23px;
+      display: inline-block;
+      text-decoration: none;
+      margin: 8px 4px;
+    }
+    .btn.secondary { background: var(--brown); }
+    section { padding: 48px 7%; }
+    .section-title { text-align: center; font-size: 32px; margin-bottom: 10px; }
+    .subtitle { text-align: center; margin-bottom: 30px; }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 20px;
+    }
+    .product {
+      background: white;
+      border: 1px solid #f0e1e8;
+      border-radius: 18px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 5px 18px #563d4810;
+    }
+    .product .emoji { font-size: 48px; }
+    .product h3 { margin-bottom: 7px; }
+    .price { color: var(--pink-dark); font-weight: bold; font-size: 20px; }
+    .product button { margin-top: 10px; }
+    .feature {
+      background: var(--lavender);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+    }
+    .panel {
+      max-width: 650px;
+      margin: 20px auto;
+      padding: 25px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 5px 20px #563d4810;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e6d6df;
+      border-radius: 10px;
+      margin: 7px 0 14px;
+      background: #fffdfd;
+    }
+    label { font-size: 14px; }
+    .cart-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid #eee;
+      padding: 10px 0;
+    }
+    .muted { color: #8b7480; font-size: 14px; }
+    .hidden { display: none; }
+    footer {
+      background: var(--brown);
+      color: white;
+      padding: 30px 15px;
+      text-align: center;
+    }
+    #status { min-height: 24px; color: var(--pink-dark); }
+    @media(max-width:600px) {
+      header { justify-content: center; }
+      nav { justify-content: center; }
+      section { padding: 35px 5%; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Cosy <span>Craving ♡</span></div>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#shop">Shop</a>
+    <a href="#custom">Craving Match</a>
+    <a href="#cart">Cart (<span id="cart-count">0</span>)</a>
+    <a href="#owner">Owner</a>
+  </nav>
+</header>
+
+<div class="hero" id="home">
+  <p>♡ A LITTLE BOX FULL OF HAPPINESS ♡</p>
+  <h1>Your mood. Your cravings.<br>Your comfort.</h1>
+  <p>Thoughtful gifts, cosy surprises and little reasons to smile.</p>
+  <a class="btn" href="#shop">Explore the collection</a>
+  <a class="btn secondary" href="#custom">Create your own box</a>
+</div>
+
+<section id="shop">
+  <h2 class="section-title">Our Little Collection ♡</h2>
+  <p class="subtitle">Find something special for every mood.</p>
+  <p id="loading" class="subtitle">Loading our collection...</p>
+  <div class="products" id="products"></div>
+  <p id="product-error" class="subtitle"></p>
+</section>
+
+<section id="custom">
+  <div class="feature">
+    <h2 class="section-title">The Craving Match ✨</h2>
+    <p>Tell us your mood and we'll help you create a little box of happiness.</p>
+    <div class="panel">
+      <label for="mood">What's your mood?</label>
+      <input id="mood" placeholder="Happy, stressed, romantic, cosy...">
+      <label for="budget">What's your budget? (₹)</label>
+      <input id="budget" type="number" min="1" placeholder="Example: 400">
+      <label for="preferences">What would you love inside?</label>
+      <textarea id="preferences" rows="3" placeholder="Snacks, cute accessories, chocolates..."></textarea>
+      <button class="btn" onclick="createMatch()">Create my Craving Match ♡</button>
+      <p id="match-result"></p>
+    </div>
+  </div>
+</section>
+
+<section id="cart">
+  <h2 class="section-title">Your Shopping Bag ♡</h2>
+  <div class="panel">
+    <div id="cart-items">Your cart is waiting for something lovely!</div>
+    <h3 id="cart-total">Total: ₹0</h3>
+    <p class="muted">Delivery charges will be calculated separately.</p>
+    <a class="btn" href="#checkout">Continue to checkout</a>
+  </div>
+</section>
+
+<section id="checkout">
+  <h2 class="section-title">Checkout ♡</h2>
+  <div class="panel">
+    <p>Fill in your details to prepare your order.</p>
+    <label for="customer-name">Full name</label>
+    <input id="customer-name" autocomplete="name" placeholder="Your name">
+    <label for="customer-email">Email address</label>
+    <input id="customer-email" type="email" autocomplete="email" placeholder="you@example.com">
+    <label for="customer-phone">Phone number</label>
+    <input id="customer-phone" type="tel" autocomplete="tel" placeholder="Your phone number">
+    <label for="customer-address">Complete delivery address</label>
+    <textarea id="customer-address" rows="3" autocomplete="street-address" placeholder="House number, street, city, PIN code"></textarea>
+    <p class="muted">Payment will initially be arranged through UPI. Your order will be confirmed after payment verification.</p>
+    <button class="btn" onclick="prepareOrder()">Continue with order</button>
+    <p id="checkout-status" role="status"></p>
+  </div>
+</section>
+
+<section id="owner">
+  <h2 class="section-title">Store Owner ♡</h2>
+  <div class="panel">
+    <p class="muted">Private store management area.</p>
+    <label for="owner-email">Owner email</label>
+    <input id="owner-email" type="email" placeholder="Your store login email">
+    <label for="owner-password">Password</label>
+    <input id="owner-password" type="password" placeholder="Your password">
+    <button class="btn" onclick="ownerLogin()">Owner login</button>
+    <button class="btn secondary" onclick="ownerLogout()">Logout</button>
+    <p id="owner-status" role="status"></p>
+    <div id="owner-dashboard" class="hidden">
+      <h3>Welcome to your store!</h3>
+      <p>You are signed in. We'll add product and order management here next.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <h2>Cosy Craving ♡</h2>
+  <p>Your mood. Your cravings. Your comfort.</p>
+  <p>Made with love, just for you.</p>
+</footer>
+
+<script>
+  // We'll add your Supabase Project URL and Publishable Key in the next step.
+  const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+  const SUPABASE_PUBLISHABLE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+  let supabaseClient = null;
+  let products = [];
+  let cart = [];
+
+  if (window.supabase &&
+      SUPABASE_URL.startsWith("https://") &&
+      SUPABASE_PUBLISHABLE_KEY !== "YOUR_SUPABASE_PUBLISHABLE_KEY") {
+    supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+  }
+
+  async function loadProducts() {
+    const container = document.getElementById("products");
+    document.getElementById("loading").textContent = "";
+
+    if (!supabaseClient) {
+      document.getElementById("product-error").textContent =
+        "Our collection will appear here once the store connection is added.";
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("products")
+      .select("id, name, description, price_inr, image_url")
+      .eq("in_stock", true)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      document.getElementById("product-error").textContent =
+        "Couldn't load products. Please try again later.";
+      return;
+    }
+
+    products = data || [];
+    container.innerHTML = "";
+
+    products.forEach(product => {
+      const card = document.createElement("article");
+      card.className = "product";
+
+      const emoji = document.createElement("div");
+      emoji.className = "emoji";
+      emoji.textContent = "🎀";
+
+      if (product.image_url) {
+        const img = document.createElement("img");
+        img.src = product.image_url;
+        img.alt = product.name;
+        img.style.cssText = "width:100%;height:150px;object-fit:cover;border-radius:12px";
+        img.onerror = () => img.remove();
+        card.appendChild(img);
+      } else {
+        card.appendChild(emoji);
+      }
+
+      const name = document.createElement("h3");
+      name.textContent = product.name;
+      const description = document.createElement("p");
+      description.textContent = product.description || "";
+      const price = document.createElement("p");
+      price.className = "price";
+      price.textContent = "₹" + product.price_inr;
+      const add = document.createElement("button");
+      add.className = "btn";
+      add.textContent = "Add to bag ♡";
+      add.addEventListener("click", () => addToCart(product.id));
+
+      card.append(name, description, price, add);
+      container.appendChild(card);
+    });
+  }
+
+  function addToCart(id) {
+    const product = products.find(item => item.id === id);
+    if (!product) return;
+    const existing = cart.find(item => item.id === id);
+    if (existing) existing.quantity += 1;
+    else cart.push({ ...product, quantity: 1 });
+    updateCart();
+  }
+
+  function updateCart() {
+    const container = document.getElementById("cart-items");
+    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const total = cart.reduce((sum, item) => sum + item.price_inr * item.quantity, 0);
+
+    document.getElementById("cart-count").textContent = count;
+    document.getElementById("cart-total").textContent = "Total: ₹" + total;
+
+    if (!cart.length) {
+      container.textContent = "Your cart is waiting for something lovely!";
+      return;
+    }
+
+    container.innerHTML = "";
+    cart.forEach(item => {
+      const line = document.createElement("div");
+      line.className = "cart-line";
+      const label = document.createElement("span");
+      label.textContent = item.name + " × " + item.quantity;
+      const amount = document.createElement("strong");
+      amount.textContent = "₹" + (item.price_inr * item.quantity);
+      const remove = document.createElement("button");
+      remove.textContent = "Remove";
+      remove.className = "btn secondary";
+      remove.addEventListener("click", () => {
+        cart = cart.filter(entry => entry.id !== item.id);
+        updateCart();
+      });
+      line.append(label, amount, remove);
+      container.appendChild(line);
+    });
+  }
+
+  function createMatch() {
+    const mood = document.getElementById("mood").value.trim();
+    const budget = Number(document.getElementById("budget").value);
+    const preferences = document.getElementById("preferences").value.trim();
+    const result = document.getElementById("match-result");
+
+    if (!mood || !budget || budget <= 0) {
+      result.textContent = "Please enter your mood and a valid budget.";
+      return;
+    }
+
+    result.textContent =
+      "Your Craving Match request: " + mood +
+      " mood, ₹" + budget + " budget. " +
+      (preferences ? "You'd love: " + preferences + ". " : "") +
+      "We'll make it special! Add your request to your order when checkout is ready.";
+  }
+
+  function prepareOrder() {
+    const status = document.getElementById("checkout-status");
+    if (!cart.length) {
+      status.textContent = "Please add something to your cart first.";
+      return;
+    }
+
+    const name = document.getElementById("customer-name").value.trim();
+    const email = document.getElementById("customer-email").value.trim();
+    const phone = document.getElementById("customer-phone").value.trim();
+    const address = document.getElementById("customer-address").value.trim();
+
+    if (!name || !email || !phone || !address) {
+      status.textContent = "Please complete all your delivery details.";
+      return;
+    }
+
+    status.textContent =
+      "Your details are filled in. Secure order submission will be enabled after we connect the checkout backend.";
+  }
+
+  async function ownerLogin() {
+    const status = document.getElementById("owner-status");
+    if (!supabaseClient) {
+      status.textContent = "The store connection has not been configured yet.";
+      return;
+    }
+
+    const email = document.getElementById("owner-email").value.trim();
+    const password = document.getElementById("owner-password").value;
+
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      status.textContent = "Login failed. Please check your details.";
+      return;
+    }
+
+    status.textContent = "Owner login successful!";
+    document.getElementById("owner-dashboard").classList.remove("hidden");
+  }
+
+  async function ownerLogout() {
+    if (supabaseClient) await supabaseClient.auth.signOut();
+    document.getElementById("owner-dashboard").classList.add("hidden");
+    document.getElementById("owner-status").textContent = "Logged out.";
+  }
+
+  loadProducts();
+</script>
+</body>
+</html>

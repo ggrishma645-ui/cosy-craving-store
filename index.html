@@ -209,9 +209,29 @@
     <button class="btn secondary" onclick="ownerLogout()">Logout</button>
     <p id="owner-status" role="status"></p>
     <div id="owner-dashboard" class="hidden">
-      <h3>Welcome to your store!</h3>
-      <p>You are signed in. We'll add product and order management here next.</p>
-    </div>
+      <h3>Welcome to your store! ♡</h3>
+
+<div class="panel">
+  <h3>Add a New Product</h3>
+
+  <label for="new-product-name">Product name</label>
+  <input id="new-product-name" type="text" placeholder="Enter product name">
+
+  <label for="new-product-description">Description</label>
+  <textarea id="new-product-description" placeholder="Describe your product"></textarea>
+
+  <label for="new-product-price">Price (₹)</label>
+  <input id="new-product-price" type="number" min="0" placeholder="Enter price">
+
+  <label for="new-product-image">Product image URL</label>
+  <input id="new-product-image" type="url" placeholder="Image link (optional)">
+
+  <p id="product-admin-status" role="status"></p>
+  <button class="btn" onclick="addOwnerProduct()">
+  Add Product ♡
+</button>
+  <div id="product-admin-list"></div>
+</div>
   </div>
 </section>
 
@@ -403,6 +423,7 @@
 
     status.textContent = "Owner login successful!";
     document.getElementById("owner-dashboard").classList.remove("hidden");
+    await loadOwnerProducts();
   }
 
   async function ownerLogout() {
@@ -412,6 +433,122 @@
   }
 
   loadProducts();
+  
+async function loadOwnerProducts() {
+  const list = document.getElementById("product-admin-list");
+  const status = document.getElementById("product-admin-status");
+
+  list.textContent = "Loading products...";
+
+  const { data, error } = await supabaseClient
+    .from("products")
+    .select("id, name, description, price_inr, in_stock")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    list.textContent = "Could not load products. Check owner access.";
+    return;
+  }
+
+  list.replaceChildren();
+
+  data.forEach(product => {
+    const item = document.createElement("div");
+    item.className = "panel";
+
+    const name = document.createElement("h4");
+    name.textContent = product.name;
+
+    const price = document.createElement("p");
+    price.textContent = "Price: ₹" + product.price_inr;
+
+    const stock = document.createElement("p");
+    stock.textContent = product.in_stock ? "In stock" : "Out of stock";
+
+    const toggle = document.createElement("button");
+    toggle.className = "btn secondary";
+    toggle.textContent = product.in_stock
+      ? "Mark out of stock"
+      : "Mark in stock";
+
+    toggle.onclick = async () => {
+      const { error } = await supabaseClient
+        .from("products")
+        .update({ in_stock: !product.in_stock })
+        .eq("id", product.id);
+
+      if (error) {
+        status.textContent = "Could not update stock.";
+      } else {
+        status.textContent = "Stock updated!";
+        await loadOwnerProducts();
+      }
+    };
+
+    const remove = document.createElement("button");
+    remove.className = "btn secondary";
+    remove.textContent = "Delete product";
+
+    remove.onclick = async () => {
+      if (!confirm("Are you sure you want to delete " + product.name + "?")) {
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from("products")
+        .delete()
+        .eq("id", product.id);
+
+      if (error) {
+        status.textContent = "Could not delete product.";
+      } else {
+        status.textContent = "Product deleted.";
+        await loadOwnerProducts();
+      }
+    };
+
+    item.append(name, price, stock, toggle, remove);
+    list.appendChild(item);
+  });
+}
+
+async function addOwnerProduct() {
+  const status = document.getElementById("product-admin-status");
+
+  const name = document.getElementById("new-product-name").value.trim();
+  const description = document.getElementById("new-product-description").value.trim();
+  const price = Number(document.getElementById("new-product-price").value);
+  const image = document.getElementById("new-product-image").value.trim();
+
+  if (!name || !Number.isInteger(price) || price < 0) {
+    status.textContent = "Enter a product name and a valid whole-number price.";
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("products")
+    .insert({
+      name: name,
+      description: description,
+      price_inr: price,
+      image_url: image || null,
+      in_stock: true
+    });
+
+  if (error) {
+    status.textContent = "Could not add product. Check owner access.";
+    return;
+  }
+
+  status.textContent = "Product added successfully!";
+
+  document.getElementById("new-product-name").value = "";
+  document.getElementById("new-product-description").value = "";
+  document.getElementById("new-product-price").value = "";
+  document.getElementById("new-product-image").value = "";
+
+  await loadOwnerProducts();
+}
 </script>
 </body>
 </html>

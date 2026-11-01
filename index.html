@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cosy Craving | Gifts Made With Love</title>
-  <meta name="description" content="Your mood. Your cravings. Your comfort. Discover thoughtful gift boxes at Cosy Craving.">
+  <title>Cozy Craving | Gifts Made With Love</title>
+  <meta name="description" content="Your mood. Your cravings. Your comfort. Discover thoughtful gift boxes at Cozy Craving.">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
@@ -236,7 +236,7 @@
 </section>
 
 <footer>
-  <h2>Cosy Craving ♡</h2>
+  <h2>Cozy Craving ♡</h2>
   <p>Your mood. Your cravings. Your comfort.</p>
   <p>Made with love, just for you.</p>
 </footer>
@@ -273,8 +273,7 @@
       .from("products")
       .select("id, name, description, price_inr, image_url")
       .eq("in_stock", true)
-      .order("created_at", { ascending: true });
-
+      .order("display_order", { ascending: true });
     if (error) {
       document.getElementById("product-error").textContent =
          "Database error: " + error.message;

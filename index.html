@@ -547,10 +547,14 @@ card.append(name, description, price, add, customize, quantityControl);
     customizationExtras.forEach((extra, index) => {
       const label = document.createElement("label");
       label.className = "extra-option";
+label.style.cssText =
+  "display:flex;align-items:center;gap:12px;padding:12px 14px;margin:8px 0;background:#fff;border:1px solid #f0d8e2;border-radius:12px;cursor:pointer;font-size:16px;text-align:left;";
 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.className = "extra-checkbox";
+checkbox.style.cssText =
+  "width:18px;height:18px;flex-shrink:0;accent-color:#b56b91;cursor:pointer;margin:0;";
       checkbox.value = index;
       checkbox.addEventListener("change", updateCustomizationTotal);
 

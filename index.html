@@ -357,6 +357,94 @@
     container.appendChild(card);
   });
 }
+    let selectedBox = null;
+
+  const customizationExtras = [
+    { name: "Scrunchie", price: 25 },
+    { name: "Chocolate Add-on", price: 50 },
+    { name: "Cute Charm", price: 40 },
+    { name: "Handwritten Letter", price: 10 },
+    { name: "Pendant", price: 20 }
+  ];
+
+  function openCustomization(id) {
+    selectedBox = products.find(item => item.id === id);
+    if (!selectedBox) return;
+
+    const options = document.getElementById("customization-options");
+    options.innerHTML = "";
+
+    customizationExtras.forEach((extra, index) => {
+      const label = document.createElement("label");
+      label.style.display = "block";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = index;
+      checkbox.addEventListener("change", updateCustomizationTotal);
+
+      label.append(
+        checkbox,
+        document.createTextNode(` ${extra.name} (+₹${extra.price})`)
+      );
+
+      options.appendChild(label);
+    });
+
+    document.getElementById("custom-note").value = "";
+    document.getElementById("customization-total").textContent =
+      "Extras total: ₹0";
+
+    document.getElementById("customization-modal").style.display = "block";
+  }
+
+  function closeCustomization() {
+    document.getElementById("customization-modal").style.display = "none";
+    selectedBox = null;
+  }
+
+  function updateCustomizationTotal() {
+    const checked = document.querySelectorAll(
+      "#customization-options input:checked"
+    );
+
+    const extrasTotal = Array.from(checked).reduce((sum, checkbox) => {
+      return sum + customizationExtras[Number(checkbox.value)].price;
+    }, 0);
+
+    document.getElementById("customization-total").textContent =
+      "Extras total: ₹" + extrasTotal;
+  }
+
+  function addCustomizedBox() {
+    if (!selectedBox) return;
+
+    const checked = document.querySelectorAll(
+      "#customization-options input:checked"
+    );
+
+    const extras = Array.from(checked).map(checkbox => {
+      return customizationExtras[Number(checkbox.value)];
+    });
+
+    const extrasTotal = extras.reduce((sum, extra) => sum + extra.price, 0);
+
+    const note = document.getElementById("custom-note").value.trim();
+
+    const customizedItem = {
+      ...selectedBox,
+      id: selectedBox.id + "-custom-" + Date.now(),
+      name: selectedBox.name + (extras.length ? " + Extras" : ""),
+      price_inr: selectedBox.price_inr + extrasTotal,
+      quantity: 1,
+      extras: extras,
+      personal_note: note
+    };
+
+    cart.push(customizedItem);
+    updateCart();
+    closeCustomization();
+  }
 
   function addToCart(id) {
     const product = products.find(item => item.id === id);

@@ -377,6 +377,7 @@ add.textContent = "Add to Cart ♡";
 add.addEventListener("click", () => {
   addToCart(product.id);
   refreshBoxQuantity();
+  quantityControl.style.display = "flex";
 });
 
 const customize = document.createElement("button");

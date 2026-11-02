@@ -259,65 +259,104 @@
     );
   }
 
-  async function loadProducts() {
-    const container = document.getElementById("products");
-    document.getElementById("loading").textContent = "";
+ async function loadProducts() {
+  const container = document.getElementById("products");
+  document.getElementById("loading").textContent = "";
 
-    if (!supabaseClient) {
-      document.getElementById("product-error").textContent =
-        "Our collection will appear here once the store connection is added.";
-      return;
-    }
-
-    const { data, error } = await supabaseClient
-      .from("products")
-      .select("id, name, description, price_inr, image_url")
-      .eq("in_stock", true)
-      .order("display_order", { ascending: true });
-    if (error) {
-      document.getElementById("product-error").textContent =
-         "Database error: " + error.message;
-      return;
-    }
-
-    products = data || [];
-    container.innerHTML = "";
-
-    products.forEach(product => {
-      const card = document.createElement("article");
-      card.className = "product";
-
-      const emoji = document.createElement("div");
-      emoji.className = "emoji";
-      emoji.textContent = "🎀";
-
-      if (product.image_url) {
-        const img = document.createElement("img");
-        img.src = product.image_url;
-        img.alt = product.name;
-        img.style.cssText = "width:100%;height:150px;object-fit:cover;border-radius:12px";
-        img.onerror = () => img.remove();
-        card.appendChild(img);
-      } else {
-        card.appendChild(emoji);
-      }
-
-      const name = document.createElement("h3");
-      name.textContent = product.name;
-      const description = document.createElement("p");
-      description.textContent = product.description || "";
-      const price = document.createElement("p");
-      price.className = "price";
-      price.textContent = "₹" + product.price_inr;
-      const add = document.createElement("button");
-      add.className = "btn";
-      add.textContent = "Add to bag ♡";
-      add.addEventListener("click", () => addToCart(product.id));
-
-      card.append(name, description, price, add);
-      container.appendChild(card);
-    });
+  if (!supabaseClient) {
+    document.getElementById("product-error").textContent =
+      "Our collection will appear here once the store connection is added.";
+    return;
   }
+
+  const { data, error } = await supabaseClient
+    .from("products")
+    .select("id, name, description, price_inr, image_url")
+    .eq("in_stock", true)
+    .order("display_order", { ascending: true });
+
+  if (error) {
+    document.getElementById("product-error").textContent =
+      "Database error: " + error.message;
+    return;
+  }
+
+  const prices = {
+    "Just in Case Box": 130,
+    "Little Lift Box": 150,
+    "Cozy Craving Box": 310,
+    "Sweet Cravings Box": 240,
+    "Scrunchie": 25,
+    "Chocolate Add-on": 50,
+    "Cute Charm": 40,
+    "Handwritten Letter": 10,
+    "Pendant": 20
+  };
+
+  const boxNames = [
+    "Just in Case Box",
+    "Little Lift Box",
+    "Cozy Craving Box",
+    "Sweet Cravings Box"
+  ];
+
+  products = (data || [])
+    .filter(product => Object.prototype.hasOwnProperty.call(prices, product.name))
+    .map(product => ({
+      ...product,
+      price_inr: prices[product.name]
+    }));
+
+  container.innerHTML = "";
+
+  products.forEach(product => {
+    const card = document.createElement("article");
+    card.className = "product";
+
+    const emoji = document.createElement("div");
+    emoji.className = "emoji";
+    emoji.textContent = "🎀";
+
+    if (product.image_url) {
+      const img = document.createElement("img");
+      img.src = product.image_url;
+      img.alt = product.name;
+      img.style.cssText =
+        "width:100%;height:150px;object-fit:cover;border-radius:12px";
+      img.onerror = () => img.remove();
+      card.appendChild(img);
+    } else {
+      card.appendChild(emoji);
+    }
+
+    const name = document.createElement("h3");
+    name.textContent = product.name;
+
+    const description = document.createElement("p");
+    description.textContent = product.description || "";
+
+    const price = document.createElement("p");
+    price.className = "price";
+    price.textContent = "₹" + product.price_inr;
+
+    const add = document.createElement("button");
+    add.className = "btn";
+    add.textContent = boxNames.includes(product.name)
+      ? "Customize ♡"
+      : "Add to bag ♡";
+
+    add.addEventListener("click", () => {
+      if (boxNames.includes(product.name)) {
+        openCustomization(product.id);
+      } else {
+        addToCart(product.id);
+      }
+    });
+
+    card.append(name, description, price, add);
+    container.appendChild(card);
+  });
+}
 
   function addToCart(id) {
     const product = products.find(item => item.id === id);
@@ -549,5 +588,25 @@ async function addOwnerProduct() {
   await loadOwnerProducts();
 }
 </script>
+  <div id="customization-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <button type="button" class="btn secondary" onclick="closeCustomization()">Close ✕</button>
+
+    <h2>Customize Your Box ♡</h2>
+    <p>Choose your little extras:</p>
+
+    <div id="customization-options"></div>
+
+    <label for="custom-note">Personal note (optional)</label>
+    <textarea id="custom-note" rows="3"
+      placeholder="Write a sweet little message..."></textarea>
+
+    <p id="customization-total">Extras total: ₹0</p>
+
+    <button type="button" class="btn" onclick="addCustomizedBox()">
+      Add customized box ♡
+    </button>
+  </div>
+</div>
 </body>
 </html>

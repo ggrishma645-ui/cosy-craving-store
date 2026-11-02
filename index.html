@@ -374,14 +374,66 @@ const boxOrder = {
     const add = document.createElement("button");
 add.className = "btn";
 add.textContent = "Add to Cart ♡";
-add.addEventListener("click", () => addToCart(product.id));
+add.addEventListener("click", () => {
+  addToCart(product.id);
+  refreshBoxQuantity();
+});
 
 const customize = document.createElement("button");
 customize.className = "btn secondary";
 customize.textContent = "Customize ♡";
 customize.addEventListener("click", () => openCustomization(product.id));
 
-    card.append(name, description, price, add, customize);
+    const quantityControl = document.createElement("div");
+quantityControl.className = "quantity-control";
+quantityControl.style.display = "none";
+quantityControl.style.marginTop = "10px";
+quantityControl.style.display = "flex";
+quantityControl.style.alignItems = "center";
+quantityControl.style.justifyContent = "center";
+quantityControl.style.gap = "12px";
+
+const minus = document.createElement("button");
+minus.textContent = "−";
+minus.className = "btn secondary";
+
+const quantity = document.createElement("span");
+quantity.textContent = "0";
+
+const plus = document.createElement("button");
+plus.textContent = "+";
+plus.className = "btn secondary";
+
+quantityControl.append(minus, quantity, plus);
+    function refreshBoxQuantity() {
+  const cartItem = cart.find(item => item.id === product.id);
+  const count = cartItem ? cartItem.quantity : 0;
+
+  quantity.textContent = count;
+  quantityControl.style.display = count > 0 ? "flex" : "none";
+}
+
+minus.addEventListener("click", () => {
+  const cartItem = cart.find(item => item.id === product.id);
+  if (!cartItem) return;
+
+  if (cartItem.quantity > 1) {
+    cartItem.quantity -= 1;
+  } else {
+    cart = cart.filter(item => item.id !== product.id);
+  }
+
+  updateCart();
+  refreshBoxQuantity();
+});
+
+plus.addEventListener("click", () => {
+  addToCart(product.id);
+  refreshBoxQuantity();
+});
+
+card.append(name, description, price, add, customize, quantityControl);
+    refreshBoxQuantity();
     container.appendChild(card);
   });
 }

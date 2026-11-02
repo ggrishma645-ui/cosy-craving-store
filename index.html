@@ -317,19 +317,27 @@
     "Pendant": 20
   };
 
-  const boxNames = [
-    "Just in Case Box",
-    "Little Lift Box",
-    "Cozy Craving Box",
-    "Sweet Cravings Box"
-  ];
+ const boxNames = [
+  "Just in Case Box",
+  "Little Lift Box",
+  "Sweet Cravings Box",
+  "Cozy Craving Box"
+];
+
+const boxOrder = {
+  "Just in Case Box": 1,
+  "Little Lift Box": 2,
+  "Sweet Cravings Box": 3,
+  "Cozy Craving Box": 4
+};
 
   products = (data || [])
-    .filter(product => Object.prototype.hasOwnProperty.call(prices, product.name))
-    .map(product => ({
-      ...product,
-      price_inr: prices[product.name]
-    }));
+  .filter(product => boxNames.includes(product.name))
+  .map(product => ({
+    ...product,
+    price_inr: prices[product.name]
+  }))
+  .sort((a, b) => boxOrder[a.name] - boxOrder[b.name]);
 
   container.innerHTML = "";
 
@@ -364,20 +372,16 @@
     price.textContent = "₹" + product.price_inr;
 
     const add = document.createElement("button");
-    add.className = "btn";
-    add.textContent = boxNames.includes(product.name)
-      ? "Customize ♡"
-      : "Add to bag ♡";
+add.className = "btn";
+add.textContent = "Add to Cart ♡";
+add.addEventListener("click", () => addToCart(product.id));
 
-    add.addEventListener("click", () => {
-      if (boxNames.includes(product.name)) {
-        openCustomization(product.id);
-      } else {
-        addToCart(product.id);
-      }
-    });
+const customize = document.createElement("button");
+customize.className = "btn secondary";
+customize.textContent = "Customize ♡";
+customize.addEventListener("click", () => openCustomization(product.id));
 
-    card.append(name, description, price, add);
+    card.append(name, description, price, add, customize);
     container.appendChild(card);
   });
 }

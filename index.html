@@ -145,6 +145,95 @@
   border-radius: 18px;
   box-sizing: border-box;
 }
+    /* Customization popup layout */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(40, 25, 30, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: auto;
+  padding: 28px;
+  background: #fffafc;
+  color: #4b2e2e;
+  border: 1px solid #f0d8e2;
+  border-radius: 22px;
+  box-shadow: 0 16px 45px rgba(40, 20, 30, 0.25);
+  box-sizing: border-box;
+}
+
+.modal-content h2 {
+  margin: 8px 0 12px;
+  font-size: 28px;
+  line-height: 1.25;
+}
+
+.modal-content p {
+  margin: 10px 0 18px;
+}
+
+.extra-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin: 8px 0;
+  background: #fff;
+  border: 1px solid #f0d8e2;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.extra-checkbox {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: #b56b91;
+  cursor: pointer;
+}
+
+#custom-note {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid #e8cbd8;
+  border-radius: 12px;
+  font: inherit;
+}
+
+#customization-total {
+  font-weight: 700;
+  margin: 18px 0;
+}
+
+@media (max-width: 480px) {
+  .modal {
+    padding: 10px;
+  }
+
+  .modal-content {
+    padding: 20px;
+    max-height: 94vh;
+  }
+
+  .modal-content h2 {
+    font-size: 23px;
+  }
+}
   </style>
 </head>
 <body>
@@ -457,10 +546,11 @@ card.append(name, description, price, add, customize, quantityControl);
 
     customizationExtras.forEach((extra, index) => {
       const label = document.createElement("label");
-      label.style.display = "block";
+      label.className = "extra-option";
 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
+      checkbox.className = "extra-checkbox";
       checkbox.value = index;
       checkbox.addEventListener("change", updateCustomizationTotal);
 

@@ -348,6 +348,51 @@ nav a {
   #home h1 {
     font-size: 38px;
   }
+  .hero {
+  background: linear-gradient(135deg, #F8E6DD, #EBD9D3);
+  color: #482C26;
+  text-align: center;
+  padding: 90px 20px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.hero p {
+  max-width: 750px;
+  margin: 15px auto;
+  text-align: center;
+  line-height: 1.7;
+}
+
+.hero h1 {
+  max-width: 1000px;
+  margin: 25px auto;
+  text-align: center;
+  line-height: 1.2;
+  font-size: clamp(36px, 5vw, 64px);
+  color: #482C26;
+}
+
+.hero .btn {
+  display: inline-block;
+  margin: 10px;
+  text-align: center;
+}
+
+.hero .btn.secondary {
+  background: #482C26;
+  color: #FFF9F5;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 60px 20px;
+  }
+
+  .hero h1 {
+    font-size: 38px;
+  }
+}
 }
   </style>
 </head>

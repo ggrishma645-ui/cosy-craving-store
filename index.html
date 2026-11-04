@@ -8,13 +8,16 @@
   <meta name="description" content="Your mood. Your cravings. Your comfort. Discover thoughtful gift boxes at Cozy Craving.">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root {
-  --pink: #F8EAF4;
-  --pink-dark: #BD7897;
-  --lavender: #E9DDF8;
-  --brown: #563D48;
-  --cream: #EDE5F7;
-  --white: #FFFFFF;
+   :root {
+  --pink: #F8E6DD;
+  --pink-dark: #D99B91;
+  --lavender: #EBD9D3;
+  --brown: #482C26;
+  --cream: #F8E6DD;
+  --white: #FFF9F5;
+
+  --rose-gold: #B87959;
+  --chocolate: #482C26;
 }
     * { box-sizing: border-box; }
     body {
@@ -35,10 +38,23 @@
       flex-wrap: wrap;
       border-bottom: 1px solid #f1e4e9;
     }
-    .brand {
-  font-size: 27px;
-  font-weight: bold;
-  color: #563D48 !important;
+   .brand {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.brand a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.brand-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  display: block;
 }
 
 .brand span {
@@ -247,7 +263,15 @@
 <body>
 
 <header>
-  <div class="brand">Cozy <span>Craving ♡</span></div>
+ <div class="brand">
+  <a href="#home">
+    <img
+      src="cosy-craving-logo.jpeg"
+      alt="Cozy Craving CC Logo"
+      class="brand-logo"
+    >
+  </a>
+</div>
   <nav>
     <a href="#home">Home</a>
     <a href="#shop">Shop</a>

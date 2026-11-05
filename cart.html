@@ -1,0 +1,1096 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cozy Craving | Gifts Made With Love</title>
+  <meta name="description" content="Your mood. Your cravings. Your comfort. Discover thoughtful gift boxes at Cozy Craving.">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+   :root {
+  --pink: #F8E6DD;
+  --pink-dark: #D99B91;
+  --lavender: #EBD9D3;
+  --brown: #482C26;
+  --cream: #F8E6DD;
+  --white: #FFF9F5;
+
+  --rose-gold: #B87959;
+  --chocolate: #482C26;
+}
+    * { box-sizing: border-box; }
+    body {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #fff4f7;
+  background: #3B2630;
+}
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    header {
+      background: var(--white);
+      padding: 16px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #f1e4e9;
+    }
+   .brand {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.brand a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.brand-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  display: block;
+}
+
+.brand span {
+  color: #563D48 !important;
+}
+    .btn {
+      border: 0;
+      border-radius: 25px;
+      background: var(--pink-dark);
+      color: white;
+      padding: 12px 23px;
+      display: inline-block;
+      text-decoration: none;
+      margin: 8px 4px;
+    }
+    .btn.secondary { background: var(--brown); }
+    section {
+  padding: 48px 7%;
+  background: #FFF8FC;
+  color: #563D48;
+}
+    .section-title { text-align: center; font-size: 32px; margin-bottom: 10px; }
+    .subtitle { text-align: center; margin-bottom: 30px; }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 20px;
+    }
+    .product {
+  background: linear-gradient(145deg, #fff0f7, #eee4ff);
+  border: 1px solid #ead8f0;
+  border-radius: 24px;
+  padding: 22px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(120, 80, 110, 0.10);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.product:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(120, 80, 110, 0.16);
+}
+    .product .emoji { font-size: 48px; }
+    .product h3 { margin-bottom: 7px; }
+    .price { color: var(--pink-dark); font-weight: bold; font-size: 20px; }
+    .product button { margin-top: 10px; }
+    .feature {
+      background: var(--lavender);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+    }
+    .panel {
+      max-width: 650px;
+      margin: 20px auto;
+      padding: 25px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 5px 20px #563d4810;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e6d6df;
+      border-radius: 10px;
+      margin: 7px 0 14px;
+      background: #fffdfd;
+    }
+    label { font-size: 14px; }
+    .cart-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid #eee;
+      padding: 10px 0;
+    }
+    .muted { color: #8b7480; font-size: 14px; }
+    .hidden { display: none; }
+    footer {
+      background: var(--brown);
+      color: white;
+      padding: 30px 15px;
+      text-align: center;
+    }
+    #status { min-height: 24px; color: var(--pink-dark); }
+    @media(max-width:600px) {
+      header { justify-content: center; }
+      nav { justify-content: center; }
+      section { padding: 35px 5%; }
+    }
+    .modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modal-content {
+  background: white;
+  color: #4b2e2e;
+  width: 100%;
+  max-width: 450px;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: auto;
+  padding: 24px;
+  border-radius: 18px;
+  box-sizing: border-box;
+}
+    /* Customization popup layout */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(40, 25, 30, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: auto;
+  padding: 28px;
+  background: #fffafc;
+  color: #4b2e2e;
+  border: 1px solid #f0d8e2;
+  border-radius: 22px;
+  box-shadow: 0 16px 45px rgba(40, 20, 30, 0.25);
+  box-sizing: border-box;
+}
+
+.modal-content h2 {
+  margin: 8px 0 12px;
+  font-size: 28px;
+  line-height: 1.25;
+}
+
+.modal-content p {
+  margin: 10px 0 18px;
+}
+
+.extra-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin: 8px 0;
+  background: #fff;
+  border: 1px solid #f0d8e2;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.extra-checkbox {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: #b56b91;
+  cursor: pointer;
+}
+
+#custom-note {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid #e8cbd8;
+  border-radius: 12px;
+  font: inherit;
+}
+
+#customization-total {
+  font-weight: 700;
+  margin: 18px 0;
+}
+
+@media (max-width: 480px) {
+  .modal {
+    padding: 10px;
+  }
+
+  .modal-content {
+    padding: 20px;
+    max-height: 94vh;
+  }
+
+  .modal-content h2 {
+    font-size: 23px;
+  }
+}
+    /* HEADER ALIGNMENT */
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 7%;
+  min-height: 110px;
+  box-sizing: border-box;
+  background: #FFF9F5;
+  gap: 25px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.brand-logo {
+  width: 140px;
+  height: 110px;
+  object-fit: contain;
+  display: block;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: #482C26 !important;
+  text-decoration: none;
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+/* HERO ALIGNMENT */
+
+#home {
+  text-align: center;
+  padding: 80px 7% 90px;
+  box-sizing: border-box;
+}
+
+#home h1 {
+  max-width: 1100px;
+  margin: 30px auto;
+  text-align: center;
+  line-height: 1.15;
+}
+
+#home p {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 5%;
+  }
+
+  .brand-logo {
+    width: 110px;
+    height: 90px;
+  }
+
+  nav {
+    justify-content: center;
+    gap: 12px;
+  }
+
+  nav a {
+    font-size: 15px;
+  }
+
+  #home {
+    padding: 55px 5%;
+  }
+
+  #home h1 {
+    font-size: 38px;
+  }
+  .hero {
+  background: linear-gradient(135deg, #F8E6DD, #EBD9D3);
+  color: #482C26;
+  text-align: center;
+  padding: 90px 20px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.hero p {
+  max-width: 750px;
+  margin: 15px auto;
+  text-align: center;
+  line-height: 1.7;
+}
+  .hero p:first-child {
+  font-size: 20px;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.hero h1 {
+  max-width: 1000px;
+  margin: 25px auto;
+  text-align: center;
+  font-size: 19px;
+  line-height: 1.8;
+  color: #482C26;
+}
+
+.hero .btn {
+  display: inline-block;
+  margin: 10px;
+  text-align: center;
+  font-size: 17px;
+  padding: 16px 28px;
+}
+
+.hero .btn.secondary {
+  background: #482C26;
+  color: #FFF9F5;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 60px 20px;
+  }
+
+  .hero h1 {
+    font-size: 38px;
+  }
+}
+}
+  </style>
+</head>
+<body>
+
+<header>
+ <div class="brand">
+  <a href="#home">
+    <img
+  src="cc-logo.png"
+  alt="Cozy Craving CC Logo"
+  class="brand-logo"
+>
+  </a>
+</div>
+  <nav>
+  <a href="index.html">Home</a>
+  <a href="shop.html#shop">Shop</a>
+  <a href="/addons.html">Add Ons</a>
+  <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+  <a href="owner.html">Owner</a>
+</nav>
+</header>
+
+<div class="hero" id="home">
+  <p>♡ A LITTLE BOX FULL OF HAPPINESS ♡</p>
+  <h1>Your mood. Your cravings.<br>Your comfort.</h1>
+  <p>Thoughtful gifts, cozy surprises and little reasons to smile.</p>
+  <a class="btn" href="#shop">Explore the collection</a>
+  <a class="btn secondary" href="#custom">Create your own box</a>
+</div>
+
+<section id="shop">
+  <h2 class="section-title">Our Little Collection ♡</h2>
+  <p class="subtitle">Find something special for every mood.</p>
+  <p id="loading" class="subtitle">Loading our collection...</p>
+  <div class="products" id="products"></div>
+  <p id="product-error" class="subtitle"></p>
+</section>
+
+<section id="custom">
+  <div class="feature">
+    <h2 class="section-title">The Craving Match ✨</h2>
+    <p>Tell us your mood and we'll help you create a little box of happiness.</p>
+    <div class="panel">
+      <label for="mood">What's your mood?</label>
+      <input id="mood" placeholder="Happy, stressed, romantic, cozy...">
+      <label for="budget">What's your budget? (₹)</label>
+      <input id="budget" type="number" min="1" placeholder="Example: 400">
+      <label for="preferences">What would you love inside?</label>
+      <textarea id="preferences" rows="3" placeholder="Snacks, cute accessories, chocolates..."></textarea>
+      <button class="btn" onclick="createMatch()">Create my Craving Match ♡</button>
+      <p id="match-result"></p>
+    </div>
+  </div>
+</section>
+
+<section id="cart">
+  <h2 class="section-title">Your Shopping Bag ♡</h2>
+  <div class="panel">
+    <div id="cart-items">Your cart is waiting for something lovely!</div>
+    <h3 id="cart-total">Total: ₹0</h3>
+    <p class="muted">Delivery charges will be calculated separately.</p>
+    <a class="btn" href="#checkout">Continue to checkout</a>
+  </div>
+</section>
+
+<section id="checkout">
+  <h2 class="section-title">Checkout ♡</h2>
+  <div class="panel">
+    <p>Fill in your details to prepare your order.</p>
+    <label for="customer-name">Full name</label>
+    <input id="customer-name" autocomplete="name" placeholder="Your name">
+    <label for="customer-email">Email address</label>
+    <input id="customer-email" type="email" autocomplete="email" placeholder="you@example.com">
+    <label for="customer-phone">Phone number</label>
+    <input id="customer-phone" type="tel" autocomplete="tel" placeholder="Your phone number">
+    <label for="customer-address">Complete delivery address</label>
+    <textarea id="customer-address" rows="3" autocomplete="street-address" placeholder="House number, street, city, PIN code"></textarea>
+    <p class="muted">Payment will initially be arranged through UPI. Your order will be confirmed after payment verification.</p>
+    <button class="btn" onclick="prepareOrder()">Continue with order</button>
+    <p id="checkout-status" role="status"></p>
+  </div>
+</section>
+
+<section id="owner">
+  <h2 class="section-title">Store Owner ♡</h2>
+  <div class="panel">
+    <p class="muted">Private store management area.</p>
+    <label for="owner-email">Owner email</label>
+    <input id="owner-email" type="email" placeholder="Your store login email">
+    <label for="owner-password">Password</label>
+    <input id="owner-password" type="password" placeholder="Your password">
+    <button class="btn" onclick="ownerLogin()">Owner login</button>
+    <button class="btn secondary" onclick="ownerLogout()">Logout</button>
+    <p id="owner-status" role="status"></p>
+    <div id="owner-dashboard" class="hidden">
+      <h3>Welcome to your store! ♡</h3>
+
+<div class="panel">
+  <h3>Add a New Product</h3>
+
+  <label for="new-product-name">Product name</label>
+  <input id="new-product-name" type="text" placeholder="Enter product name">
+
+  <label for="new-product-description">Description</label>
+  <textarea id="new-product-description" placeholder="Describe your product"></textarea>
+
+  <label for="new-product-price">Price (₹)</label>
+  <input id="new-product-price" type="number" min="0" placeholder="Enter price">
+
+  <label for="new-product-image">Product image URL</label>
+  <input id="new-product-image" type="url" placeholder="Image link (optional)">
+
+  <p id="product-admin-status" role="status"></p>
+  <button class="btn" onclick="addOwnerProduct()">
+  Add Product ♡
+</button>
+  <div id="product-admin-list"></div>
+</div>
+  </div>
+</section>
+
+<footer>
+  <h2>Cozy Craving ♡</h2>
+  <p>Your mood. Your cravings. Your comfort.</p>
+  <p>Made with love, just for you.</p>
+</footer>
+
+<script>
+  // We'll add your Supabase Project URL and Publishable Key in the next step.
+  const SUPABASE_URL = "https://hmpjqlimgkvgtohbhcde.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_axO2IpUc6tA1xSelOH2TQw_C15MZv4D";
+
+  let supabaseClient = null;
+  let products = [];
+  let cart = JSON.parse(localStorage.getItem("cosyCravingCart") || "[]");
+
+  if (window.supabase &&
+      SUPABASE_URL.startsWith("https://") &&
+      SUPABASE_PUBLISHABLE_KEY !== "YOUR_SUPABASE_PUBLISHABLE_KEY") {
+    supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+  }
+
+ async function loadProducts() {
+  const container = document.getElementById("products");
+  document.getElementById("loading").textContent = "";
+
+  if (!supabaseClient) {
+    document.getElementById("product-error").textContent =
+      "Our collection will appear here once the store connection is added.";
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("products")
+    .select("id, name, description, price_inr, image_url")
+    .eq("in_stock", true)
+    .order("display_order", { ascending: true });
+
+  if (error) {
+    document.getElementById("product-error").textContent =
+      "Database error: " + error.message;
+    return;
+  }
+
+  const prices = {
+    "Just in Case Box": 130,
+    "Little Lift Box": 150,
+    "Cozy Craving Box": 310,
+    "Sweet Cravings Box": 240,
+    "Scrunchie": 25,
+    "Chocolate Add-on": 50,
+    "Cute Charm": 40,
+    "Handwritten Letter": 10,
+    "Pendant": 20
+  };
+
+ const boxNames = [
+  "Just in Case Box",
+  "Little Lift Box",
+  "Sweet Cravings Box",
+  "Cozy Craving Box"
+];
+
+const boxOrder = {
+  "Just in Case Box": 1,
+  "Little Lift Box": 2,
+  "Sweet Cravings Box": 3,
+  "Cozy Craving Box": 4
+};
+
+  products = (data || [])
+  .filter(product => boxNames.includes(product.name))
+  .map(product => ({
+    ...product,
+    price_inr: prices[product.name]
+  }))
+  .sort((a, b) => boxOrder[a.name] - boxOrder[b.name]);
+
+  container.innerHTML = "";
+
+  products.forEach(product => {
+    const card = document.createElement("article");
+    card.className = "product";
+
+    const emoji = document.createElement("div");
+    emoji.className = "emoji";
+    emoji.textContent = "🎀";
+
+    if (product.image_url) {
+      const img = document.createElement("img");
+      img.src = product.image_url;
+      img.alt = product.name;
+      img.style.cssText =
+        "width:100%;height:150px;object-fit:cover;border-radius:12px";
+      img.onerror = () => img.remove();
+      card.appendChild(img);
+    } else {
+      card.appendChild(emoji);
+    }
+
+    const name = document.createElement("h3");
+    name.textContent = product.name;
+
+    const description = document.createElement("p");
+    description.textContent = product.description || "";
+
+    const price = document.createElement("p");
+    price.className = "price";
+    price.textContent = "₹" + product.price_inr;
+
+    const add = document.createElement("button");
+add.className = "btn";
+add.textContent = "Add to Cart ♡";
+add.addEventListener("click", () => {
+  addToCart(product.id);
+  refreshBoxQuantity();
+  quantityControl.style.display = "flex";
+});
+
+const customize = document.createElement("button");
+customize.className = "btn secondary";
+customize.textContent = "Add On ♡";
+customize.addEventListener("click", () => openCustomization(product.id));
+
+    const quantityControl = document.createElement("div");
+quantityControl.className = "quantity-control";
+quantityControl.style.display = "none";
+quantityControl.style.marginTop = "10px";
+quantityControl.style.display = "flex";
+quantityControl.style.alignItems = "center";
+quantityControl.style.justifyContent = "center";
+quantityControl.style.gap = "12px";
+
+const minus = document.createElement("button");
+minus.textContent = "−";
+minus.className = "btn secondary";
+
+const quantity = document.createElement("span");
+quantity.textContent = "0";
+
+const plus = document.createElement("button");
+plus.textContent = "+";
+plus.className = "btn secondary";
+
+quantityControl.append(minus, quantity, plus);
+    function refreshBoxQuantity() {
+  const cartItem = cart.find(item => item.id === product.id);
+  const count = cartItem ? cartItem.quantity : 0;
+
+  quantity.textContent = count;
+  quantityControl.style.display = count > 0 ? "flex" : "none";
+}
+
+minus.addEventListener("click", () => {
+  const cartItem = cart.find(item => item.id === product.id);
+  if (!cartItem) return;
+
+  if (cartItem.quantity > 1) {
+    cartItem.quantity -= 1;
+  } else {
+    cart = cart.filter(item => item.id !== product.id);
+  }
+
+  updateCart();
+  refreshBoxQuantity();
+});
+
+plus.addEventListener("click", () => {
+  addToCart(product.id);
+  refreshBoxQuantity();
+});
+
+card.append(name, description, price, add, customize, quantityControl);
+    refreshBoxQuantity();
+    container.appendChild(card);
+  });
+}
+    let selectedBox = null;
+
+  const customizationExtras = [
+    { name: "Scrunchie", price: 25 },
+    { name: "Chocolate Add-on", price: 50 },
+    { name: "Cute Charm", price: 40 },
+    { name: "Handwritten Letter", price: 10 },
+    { name: "Pendant", price: 20 }
+  ];
+
+  function openCustomization(id) {
+    selectedBox = products.find(item => item.id === id);
+    if (!selectedBox) return;
+
+    const options = document.getElementById("customization-options");
+    options.innerHTML = "";
+
+    customizationExtras.forEach((extra, index) => {
+      const label = document.createElement("label");
+      label.className = "extra-option";
+label.style.cssText =
+  "display:flex;align-items:center;gap:12px;padding:12px 14px;margin:8px 0;background:#fff;border:1px solid #f0d8e2;border-radius:12px;cursor:pointer;font-size:16px;text-align:left;";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "extra-checkbox";
+checkbox.style.cssText =
+  "width:18px;height:18px;flex-shrink:0;accent-color:#b56b91;cursor:pointer;margin:0;";
+      checkbox.value = index;
+      checkbox.addEventListener("change", updateCustomizationTotal);
+
+      label.append(
+        checkbox,
+        document.createTextNode(` ${extra.name} (+₹${extra.price})`)
+      );
+
+      options.appendChild(label);
+    });
+
+    document.getElementById("custom-note").value = "";
+    document.getElementById("customization-total").textContent =
+      "Extras total: ₹0";
+    const modal = document.getElementById("customization-modal");
+modal.style.cssText = "display:flex; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; padding:20px; box-sizing:border-box;";
+  }
+
+  function closeCustomization() {
+    document.getElementById("customization-modal").style.display = "none";
+    selectedBox = null;
+  }
+
+  function updateCustomizationTotal() {
+    const checked = document.querySelectorAll(
+      "#customization-options input:checked"
+    );
+
+    const extrasTotal = Array.from(checked).reduce((sum, checkbox) => {
+      return sum + customizationExtras[Number(checkbox.value)].price;
+    }, 0);
+
+    document.getElementById("customization-total").textContent =
+      "Extras total: ₹" + extrasTotal;
+  }
+
+  function addCustomizedBox() {
+    if (!selectedBox) return;
+
+    const checked = document.querySelectorAll(
+      "#customization-options input:checked"
+    );
+
+    const extras = Array.from(checked).map(checkbox => {
+      return customizationExtras[Number(checkbox.value)];
+    });
+
+    const extrasTotal = extras.reduce((sum, extra) => sum + extra.price, 0);
+
+    const note = document.getElementById("custom-note").value.trim();
+
+    const customizedItem = {
+      ...selectedBox,
+      id: selectedBox.id + "-custom-" + Date.now(),
+      name: selectedBox.name + (extras.length ? " + Extras" : ""),
+      price_inr: selectedBox.price_inr + extrasTotal,
+      quantity: 1,
+      extras: extras,
+      personal_note: note
+    };
+
+    cart.push(customizedItem);
+    updateCart();
+    closeCustomization();
+  }
+
+  function addToCart(id) {
+    const product = products.find(item => item.id === id);
+    if (!product) return;
+    const existing = cart.find(item => item.id === id);
+    if (existing) existing.quantity += 1;
+    else cart.push({ ...product, quantity: 1 });
+    updateCart();
+  }
+
+  function updateCart() {
+    localStorage.setItem("cosyCravingCart", JSON.stringify(cart));
+    const container = document.getElementById("cart-items");
+    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const total = cart.reduce((sum, item) => sum + item.price_inr * item.quantity, 0);
+
+    const countElement = document.getElementById("cart-count");
+if (countElement) countElement.textContent = count;
+
+const totalElement = document.getElementById("cart-total");
+if (totalElement) totalElement.textContent = "Total: ₹" + total;
+    if (!cart.length) {
+      container.textContent = "Your cart is waiting for something lovely!";
+      return;
+    }
+
+    container.innerHTML = "";
+    cart.forEach(item => {
+      const line = document.createElement("div");
+      line.className = "cart-line";
+      const label = document.createElement("span");
+      label.textContent =
+  item.name + " × " + item.quantity +
+  (item.extras && item.extras.length
+    ? " — " + item.extras.map(extra => extra.name).join(", ")
+    : "") +
+  (item.personal_note ? " — Note: " + item.personal_note : "");
+      const amount = document.createElement("strong");
+      amount.textContent = "₹" + (item.price_inr * item.quantity);
+      const remove = document.createElement("button");
+      remove.textContent = "Remove";
+      remove.className = "btn secondary";
+      remove.addEventListener("click", () => {
+        cart = cart.filter(entry => entry.id !== item.id);
+        updateCart();
+      });
+      line.append(label, amount, remove);
+      container.appendChild(line);
+    });
+  }
+
+  function createMatch() {
+    const mood = document.getElementById("mood").value.trim();
+    const budget = Number(document.getElementById("budget").value);
+    const preferences = document.getElementById("preferences").value.trim();
+    const result = document.getElementById("match-result");
+
+    if (!mood || !budget || budget <= 0) {
+      result.textContent = "Please enter your mood and a valid budget.";
+      return;
+    }
+
+    result.textContent =
+      "Your Craving Match request: " + mood +
+      " mood, ₹" + budget + " budget. " +
+      (preferences ? "You'd love: " + preferences + ". " : "") +
+      "We'll make it special! Add your request to your order when checkout is ready.";
+  }
+
+  async function prepareOrder() {
+  const status = document.getElementById("checkout-status");
+
+  if (!cart.length) {
+    status.textContent = "Please add something to your cart first.";
+    return;
+  }
+
+  const customer_name = document.getElementById("customer-name").value.trim();
+  const customer_email = document.getElementById("customer-email").value.trim();
+  const customer_phone = document.getElementById("customer-phone").value.trim();
+  const delivery_address = document.getElementById("customer-address").value.trim();
+
+  if (!customer_name || !customer_email || !customer_phone || !delivery_address) {
+    status.textContent = "Please complete all your delivery details.";
+    return;
+  }
+
+  const items = cart.map(item => ({
+    product_id: item.id,
+    quantity: item.quantity
+  }));
+
+  status.textContent = "Submitting your order...";
+
+  try {
+    const response = await fetch(
+      "https://hmpjqlimgkvgtohbhcde.supabase.co/functions/v1/create-order",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer sb_publishable_axO2IpUc6tA1xSelOH2TQw_C15MZv4D",
+          "apikey": "sb_publishable_axO2IpUc6tA1xSelOH2TQw_C15MZv4D"
+        },
+        body: JSON.stringify({
+          customer_name,
+          customer_email,
+          customer_phone,
+          delivery_address,
+          items
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      status.textContent = result.error || "Could not submit your order.";
+      return;
+    }
+
+    status.textContent =
+      `Your order has been received! Order ID: ${result.order_id}. Payment is pending verification.`;
+
+  } catch {
+    status.textContent = "Network error. Please try again.";
+  }
+}
+  async function ownerLogin() {
+    const status = document.getElementById("owner-status");
+    if (!supabaseClient) {
+      status.textContent = "The store connection has not been configured yet.";
+      return;
+    }
+
+    const email = document.getElementById("owner-email").value.trim();
+    const password = document.getElementById("owner-password").value;
+
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      status.textContent = "Login failed. Please check your details.";
+      return;
+    }
+
+    status.textContent = "Owner login successful!";
+    document.getElementById("owner-dashboard").classList.remove("hidden");
+    await loadOwnerProducts();
+  }
+
+  async function ownerLogout() {
+    if (supabaseClient) await supabaseClient.auth.signOut();
+    document.getElementById("owner-dashboard").classList.add("hidden");
+    document.getElementById("owner-status").textContent = "Logged out.";
+  }
+
+  loadProducts();
+  
+async function loadOwnerProducts() {
+  const list = document.getElementById("product-admin-list");
+  const status = document.getElementById("product-admin-status");
+
+  list.textContent = "Loading products...";
+
+  const { data, error } = await supabaseClient
+    .from("products")
+    .select("id, name, description, price_inr, in_stock")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    list.textContent = "Could not load products. Check owner access.";
+    return;
+  }
+
+  list.replaceChildren();
+
+  data.forEach(product => {
+    const item = document.createElement("div");
+    item.className = "panel";
+
+    const name = document.createElement("h4");
+    name.textContent = product.name;
+
+    const price = document.createElement("p");
+    price.textContent = "Price: ₹" + product.price_inr;
+
+    const stock = document.createElement("p");
+    stock.textContent = product.in_stock ? "In stock" : "Out of stock";
+
+    const toggle = document.createElement("button");
+    toggle.className = "btn secondary";
+    toggle.textContent = product.in_stock
+      ? "Mark out of stock"
+      : "Mark in stock";
+
+    toggle.onclick = async () => {
+      const { error } = await supabaseClient
+        .from("products")
+        .update({ in_stock: !product.in_stock })
+        .eq("id", product.id);
+
+      if (error) {
+        status.textContent = "Could not update stock.";
+      } else {
+        status.textContent = "Stock updated!";
+        await loadOwnerProducts();
+      }
+    };
+
+    const remove = document.createElement("button");
+    remove.className = "btn secondary";
+    remove.textContent = "Delete product";
+
+    remove.onclick = async () => {
+      if (!confirm("Are you sure you want to delete " + product.name + "?")) {
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from("products")
+        .delete()
+        .eq("id", product.id);
+
+      if (error) {
+        status.textContent = "Could not delete product.";
+      } else {
+        status.textContent = "Product deleted.";
+        await loadOwnerProducts();
+      }
+    };
+
+    item.append(name, price, stock, toggle, remove);
+    list.appendChild(item);
+  });
+}
+
+async function addOwnerProduct() {
+  const status = document.getElementById("product-admin-status");
+
+  const name = document.getElementById("new-product-name").value.trim();
+  const description = document.getElementById("new-product-description").value.trim();
+  const price = Number(document.getElementById("new-product-price").value);
+  const image = document.getElementById("new-product-image").value.trim();
+
+  if (!name || !Number.isInteger(price) || price < 0) {
+    status.textContent = "Enter a product name and a valid whole-number price.";
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("products")
+    .insert({
+      name: name,
+      description: description,
+      price_inr: price,
+      image_url: image || null,
+      in_stock: true
+    });
+
+  if (error) {
+    status.textContent = "Could not add product. Check owner access.";
+    return;
+  }
+
+  status.textContent = "Product added successfully!";
+
+  document.getElementById("new-product-name").value = "";
+  document.getElementById("new-product-description").value = "";
+  document.getElementById("new-product-price").value = "";
+  document.getElementById("new-product-image").value = "";
+
+  await loadOwnerProducts();
+}
+</script>
+  <div id="customization-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <button type="button" class="btn secondary" onclick="closeCustomization()">Close ✕</button>
+
+    <h2>Customize Your Box ♡</h2>
+    <p>Choose your little extras:</p>
+
+    <div id="customization-options"></div>
+
+    <label for="custom-note">Personal note (optional)</label>
+    <textarea id="custom-note" rows="3"
+      placeholder="Write a sweet little message..."></textarea>
+
+    <p id="customization-total">Extras total: ₹0</p>
+
+    <button type="button" class="btn" onclick="addCustomizedBox()">
+      Add customized box ♡
+    </button>
+  </div>
+</div>
+</body>
+</html>

@@ -432,13 +432,7 @@ nav a {
   <a class="btn secondary" href="#custom">Create your own box</a>
 </div>
 
-<section id="shop">
-  <h2 class="section-title">Our Little Collection ♡</h2>
-  <p class="subtitle">Find something special for every mood.</p>
-  <p id="loading" class="subtitle">Loading our collection...</p>
-  <div class="products" id="products"></div>
-  <p id="product-error" class="subtitle"></p>
-</section>
+
 
 <section id="custom">
   <div class="feature">
@@ -463,7 +457,7 @@ nav a {
     <div id="cart-items">Your cart is waiting for something lovely!</div>
     <h3 id="cart-total">Total: ₹0</h3>
     <p class="muted">Delivery charges will be calculated separately.</p>
-    <a class="btn" href="#checkout">Continue to checkout</a>
+    <a class="btn" href="cart.html#checkout">Continue to checkout</a>
   </div>
 </section>
 
@@ -689,7 +683,6 @@ minus.addEventListener("click", () => {
   }
 
   updateCart();
-  refreshBoxQuantity();
 });
 
 plus.addEventListener("click", () => {
@@ -954,7 +947,7 @@ if (totalElement) totalElement.textContent = "Total: ₹" + total;
     document.getElementById("owner-status").textContent = "Logged out.";
   }
 
-  loadProducts();
+  updateCart();
   
 async function loadOwnerProducts() {
   const list = document.getElementById("product-admin-list");

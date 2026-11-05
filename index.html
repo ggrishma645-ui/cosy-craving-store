@@ -536,7 +536,7 @@ nav a {
 
   let supabaseClient = null;
   let products = [];
-  let cart = [];
+  let cart = JSON.parse(localStorage.getItem("cosyCravingCart") || "[]");
 
   if (window.supabase &&
       SUPABASE_URL.startsWith("https://") &&
@@ -806,6 +806,7 @@ modal.style.cssText = "display:flex; position:fixed; inset:0; z-index:99999; bac
   }
 
   function updateCart() {
+    localStorage.setItem("cosyCravingCart", JSON.stringify(cart));
     const container = document.getElementById("cart-items");
     const count = cart.reduce((sum, item) => sum + item.quantity, 0);
     const total = cart.reduce((sum, item) => sum + item.price_inr * item.quantity, 0);

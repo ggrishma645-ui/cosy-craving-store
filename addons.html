@@ -794,6 +794,10 @@ modal.style.cssText = "display:flex; position:fixed; inset:0; z-index:99999; bac
   }
 
 function addToCart(id) {
+
+  // Sync cart with the latest saved data
+  cart = JSON.parse(localStorage.getItem("cosyCravingCart") || "[]");
+
   const product = products.find(item => item.id === id);
   if (!product) return;
 
@@ -809,7 +813,7 @@ function addToCart(id) {
   );
 
   if (!hasBox) {
-    alert("Please add a Cosy Craving box to your cart before choosing add-ons! ♡");
+    alert("Please add a Cosy Craving box before choosing add-ons! ♡");
     return;
   }
 
@@ -823,7 +827,6 @@ function addToCart(id) {
 
   updateCart();
 }
-
   function createMatch() {
     const mood = document.getElementById("mood").value.trim();
     const budget = Number(document.getElementById("budget").value);

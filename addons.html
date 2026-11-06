@@ -793,55 +793,36 @@ modal.style.cssText = "display:flex; position:fixed; inset:0; z-index:99999; bac
     closeCustomization();
   }
 
-  function addToCart(id) {
-    const product = products.find(item => item.id === id);
-    if (!product) return;
-    const existing = cart.find(item => item.id === id);
-    if (existing) existing.quantity += 1;
-    else cart.push({ ...product, quantity: 1 });
-    updateCart();
+function addToCart(id) {
+  const product = products.find(item => item.id === id);
+  if (!product) return;
+
+  const boxNames = [
+    "Just in Case Box",
+    "Little Lift Box",
+    "Sweet Cravings Box",
+    "Cozy Craving Box"
+  ];
+
+  const hasBox = cart.some(item =>
+    boxNames.includes(item.name)
+  );
+
+  if (!hasBox) {
+    alert("Please add a Cosy Craving box to your cart before choosing add-ons! ♡");
+    return;
   }
 
-  function updateCart() {
-    localStorage.setItem("cosyCravingCart", JSON.stringify(cart));
-    const container = document.getElementById("cart-items");
-    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const total = cart.reduce((sum, item) => sum + item.price_inr * item.quantity, 0);
+  const existing = cart.find(item => item.id === id);
 
-    const countElement = document.getElementById("cart-count");
-if (countElement) countElement.textContent = count;
-
-const totalElement = document.getElementById("cart-total");
-if (totalElement) totalElement.textContent = "Total: ₹" + total;
-    if (!cart.length) {
-      container.textContent = "Your cart is waiting for something lovely!";
-      return;
-    }
-
-    container.innerHTML = "";
-    cart.forEach(item => {
-      const line = document.createElement("div");
-      line.className = "cart-line";
-      const label = document.createElement("span");
-      label.textContent =
-  item.name + " × " + item.quantity +
-  (item.extras && item.extras.length
-    ? " — " + item.extras.map(extra => extra.name).join(", ")
-    : "") +
-  (item.personal_note ? " — Note: " + item.personal_note : "");
-      const amount = document.createElement("strong");
-      amount.textContent = "₹" + (item.price_inr * item.quantity);
-      const remove = document.createElement("button");
-      remove.textContent = "Remove";
-      remove.className = "btn secondary";
-      remove.addEventListener("click", () => {
-        cart = cart.filter(entry => entry.id !== item.id);
-        updateCart();
-      });
-      line.append(label, amount, remove);
-      container.appendChild(line);
-    });
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    cart.push({ ...product, quantity: 1 });
   }
+
+  updateCart();
+}
 
   function createMatch() {
     const mood = document.getElementById("mood").value.trim();

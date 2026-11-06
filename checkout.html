@@ -281,6 +281,22 @@ async function prepareOrder() {
     status.textContent = "Please add something to your cart first.";
     return;
   }
+  const boxNames = [
+  "Just in Case Box",
+  "Little Lift Box",
+  "Sweet Cravings Box",
+  "Cozy Craving Box"
+];
+
+const hasBox = cart.some(item =>
+  boxNames.includes(item.name)
+);
+
+if (!hasBox) {
+  status.textContent =
+    "Please add at least one Cosy Craving box. Add-ons can only be purchased with a box! ♡";
+  return;
+}
 
   const customer_name = document.getElementById("customer-name").value.trim();
   const customer_email = document.getElementById("customer-email").value.trim();

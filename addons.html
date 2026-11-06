@@ -1052,6 +1052,61 @@ async function addOwnerProduct() {
 
   await loadOwnerProducts();
 }
+  function updateCart() {
+  localStorage.setItem("cosyCravingCart", JSON.stringify(cart));
+
+  const count = cart.reduce(
+    (sum, item) => sum + item.quantity, 0
+  );
+
+  const total = cart.reduce(
+    (sum, item) => sum + item.price_inr * item.quantity, 0
+  );
+
+  const countElement = document.getElementById("cart-count");
+  if (countElement) {
+    countElement.textContent = count;
+  }
+
+  const totalElement = document.getElementById("cart-total");
+  if (totalElement) {
+    totalElement.textContent = "Total: ₹" + total;
+  }
+
+  const container = document.getElementById("cart-items");
+
+  if (!container) return;
+
+  if (!cart.length) {
+    container.textContent = "Your cart is waiting for something lovely!";
+    return;
+  }
+
+  container.innerHTML = "";
+
+  cart.forEach(item => {
+    const line = document.createElement("div");
+    line.className = "cart-line";
+
+    const label = document.createElement("span");
+    label.textContent = item.name + " × " + item.quantity;
+
+    const amount = document.createElement("strong");
+    amount.textContent = "₹" + (item.price_inr * item.quantity);
+
+    const remove = document.createElement("button");
+    remove.textContent = "Remove";
+    remove.className = "btn secondary";
+
+    remove.addEventListener("click", () => {
+      cart = cart.filter(entry => entry.id !== item.id);
+      updateCart();
+    });
+
+    line.append(label, amount, remove);
+    container.appendChild(line);
+  });
+}
 </script>
   <div id="customization-modal" class="modal" style="display:none;">
   <div class="modal-content">

@@ -380,6 +380,17 @@ if (!hasBox) {
     status.textContent = "Network error. Please try again.";
   }
 }
+  const checkoutCount = document.getElementById("cart-count");
+
+if (checkoutCount) {
+  const savedCart = JSON.parse(
+    localStorage.getItem("cosyCravingCart") || "[]"
+  );
+
+  checkoutCount.textContent = savedCart.reduce(
+    (sum, item) => sum + item.quantity, 0
+  );
+}
 </script>
 
 </body>

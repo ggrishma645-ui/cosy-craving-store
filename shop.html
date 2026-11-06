@@ -810,6 +810,7 @@ if (countElement) countElement.textContent = count;
 
 const totalElement = document.getElementById("cart-total");
 if (totalElement) totalElement.textContent = "Total: ₹" + total;
+    if (!container) return;
     if (!cart.length) {
       container.textContent = "Your cart is waiting for something lovely!";
       return;
@@ -839,6 +840,7 @@ if (totalElement) totalElement.textContent = "Total: ₹" + total;
       container.appendChild(line);
     });
   }
+  document.addEventListener("DOMContentLoaded", updateCart);
 
   function createMatch() {
     const mood = document.getElementById("mood").value.trim();

@@ -275,6 +275,7 @@
 let cart = JSON.parse(localStorage.getItem("cosyCravingCart") || "[]");
 
 async function prepareOrder() {
+  cart = JSON.parse(localStorage.getItem("cosyCravingCart") || "[]");
   const status = document.getElementById("checkout-status");
 
   if (!cart.length) {

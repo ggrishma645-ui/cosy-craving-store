@@ -1,0 +1,385 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cozy Craving | Owner Dashboard</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --pink: #F8E6DD;
+      --pink-dark: #D99B91;
+      --lavender: #EBD9D3;
+      --brown: #482C26;
+      --white: #FFF9F5;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Georgia, 'Times New Roman', serif;
+      color: var(--brown);
+      background: #3B2630;
+    }
+
+    header {
+      background: var(--white);
+      padding: 10px 7%;
+      min-height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .brand-logo {
+      width: 140px;
+      height: 100px;
+      object-fit: contain;
+    }
+
+    nav {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: var(--brown);
+      text-decoration: none;
+      font-size: 16px;
+    }
+
+    section {
+      padding: 45px 7%;
+      background: #FFF8FC;
+      min-height: 65vh;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 32px;
+    }
+
+    .panel {
+      max-width: 650px;
+      margin: 25px auto;
+      padding: 25px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 5px 20px #563d4810;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e6d6df;
+      border-radius: 10px;
+      margin: 7px 0 14px;
+      font: inherit;
+    }
+
+    label { font-size: 14px; }
+
+    .btn {
+      border: 0;
+      border-radius: 25px;
+      background: var(--pink-dark);
+      color: white;
+      padding: 12px 23px;
+      margin: 8px 4px;
+      cursor: pointer;
+    }
+
+    .btn.secondary { background: var(--brown); }
+
+    .product-item {
+      background: #FFF8FC;
+      border: 1px solid #ead8f0;
+      border-radius: 15px;
+      padding: 16px;
+      margin: 12px 0;
+    }
+
+    .hidden { display: none; }
+
+    .muted { color: #8b7480; }
+
+    #owner-status, #product-admin-status {
+      min-height: 24px;
+      color: var(--pink-dark);
+    }
+
+    footer {
+      background: var(--brown);
+      color: white;
+      padding: 30px 15px;
+      text-align: center;
+    }
+
+    @media(max-width: 600px) {
+      header { justify-content: center; }
+      nav { justify-content: center; }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <a href="index.html">
+    <img src="cc-logo.png" alt="Cozy Craving Logo" class="brand-logo">
+  </a>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="shop.html">Shop</a>
+    <a href="addons.html">Add Ons</a>
+    <a href="cart.html">Cart</a>
+    <a href="owner.html">Owner</a>
+  </nav>
+</header>
+
+<section>
+  <h2 class="section-title">Store Owner Dashboard ♡</h2>
+
+  <div class="panel" id="login-panel">
+    <h3>Owner Login</h3>
+    <p class="muted">Private store management area.</p>
+
+    <label for="owner-email">Owner email</label>
+    <input id="owner-email" type="email" placeholder="Your store login email">
+
+    <label for="owner-password">Password</label>
+    <input id="owner-password" type="password" placeholder="Your password">
+
+    <button class="btn" onclick="ownerLogin()">Login ♡</button>
+
+    <p id="owner-status" role="status"></p>
+  </div>
+
+  <div class="panel hidden" id="owner-dashboard">
+
+    <h3>Welcome to your store! ♡</h3>
+
+    <button class="btn secondary" onclick="ownerLogout()">Logout</button>
+
+    <hr>
+
+    <h3>Add a New Product</h3>
+
+    <label for="new-product-name">Product name</label>
+    <input id="new-product-name" type="text" placeholder="Enter product name">
+
+    <label for="new-product-description">Description</label>
+    <textarea id="new-product-description" placeholder="Describe your product"></textarea>
+
+    <label for="new-product-price">Price (₹)</label>
+    <input id="new-product-price" type="number" min="0" placeholder="Enter price">
+
+    <label for="new-product-image">Product image URL</label>
+    <input id="new-product-image" type="url" placeholder="Image link (optional)">
+
+    <button class="btn" onclick="addOwnerProduct()">Add Product ♡</button>
+
+    <p id="product-admin-status" role="status"></p>
+
+    <hr>
+
+    <h3>Manage Products</h3>
+    <div id="product-admin-list">Your products will appear here.</div>
+
+  </div>
+</section>
+
+<footer>
+  <h2>Cozy Craving ♡</h2>
+  <p>Your mood. Your cravings. Your comfort.</p>
+  <p>Made with love, just for you.</p>
+</footer>
+
+<script>
+  const SUPABASE_URL = "https://hmpjqlimgkvgtohbhcde.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_axO2IpUc6tA1xSelOH2TQw_C15MZv4D";
+
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+  async function ownerLogin() {
+    const status = document.getElementById("owner-status");
+
+    const email = document.getElementById("owner-email").value.trim();
+    const password = document.getElementById("owner-password").value;
+
+    if (!email || !password) {
+      status.textContent = "Please enter your email and password.";
+      return;
+    }
+
+    status.textContent = "Logging in...";
+
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      status.textContent = "Login failed. Please check your details.";
+      return;
+    }
+
+    status.textContent = "Login successful!";
+
+    document.getElementById("login-panel").classList.add("hidden");
+    document.getElementById("owner-dashboard").classList.remove("hidden");
+
+    await loadOwnerProducts();
+  }
+
+  async function ownerLogout() {
+    await supabaseClient.auth.signOut();
+
+    document.getElementById("owner-dashboard").classList.add("hidden");
+    document.getElementById("login-panel").classList.remove("hidden");
+
+    document.getElementById("owner-status").textContent = "Logged out.";
+  }
+
+  async function loadOwnerProducts() {
+    const list = document.getElementById("product-admin-list");
+    const status = document.getElementById("product-admin-status");
+
+    list.textContent = "Loading products...";
+
+    const { data, error } = await supabaseClient
+      .from("products")
+      .select("id, name, description, price_inr, in_stock")
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      list.textContent = "Could not load products. Check owner access.";
+      return;
+    }
+
+    list.replaceChildren();
+
+    data.forEach(product => {
+      const item = document.createElement("div");
+      item.className = "product-item";
+
+      const name = document.createElement("h3");
+      name.textContent = product.name;
+
+      const price = document.createElement("p");
+      price.textContent = "Price: ₹" + product.price_inr;
+
+      const stock = document.createElement("p");
+      stock.textContent = product.in_stock ? "In stock" : "Out of stock";
+
+      const toggle = document.createElement("button");
+      toggle.className = "btn secondary";
+      toggle.textContent = product.in_stock
+        ? "Mark out of stock"
+        : "Mark in stock";
+
+      toggle.onclick = async () => {
+        const { error } = await supabaseClient
+          .from("products")
+          .update({ in_stock: !product.in_stock })
+          .eq("id", product.id);
+
+        if (error) {
+          status.textContent = "Could not update stock.";
+        } else {
+          status.textContent = "Stock updated!";
+          await loadOwnerProducts();
+        }
+      };
+
+      const remove = document.createElement("button");
+      remove.className = "btn secondary";
+      remove.textContent = "Delete product";
+
+      remove.onclick = async () => {
+        if (!confirm("Are you sure you want to delete " + product.name + "?")) {
+          return;
+        }
+
+        const { error } = await supabaseClient
+          .from("products")
+          .delete()
+          .eq("id", product.id);
+
+        if (error) {
+          status.textContent = "Could not delete product.";
+        } else {
+          status.textContent = "Product deleted.";
+          await loadOwnerProducts();
+        }
+      };
+
+      item.append(name, price, stock, toggle, remove);
+      list.appendChild(item);
+    });
+  }
+
+  async function addOwnerProduct() {
+    const status = document.getElementById("product-admin-status");
+
+    const name = document.getElementById("new-product-name").value.trim();
+    const description = document.getElementById("new-product-description").value.trim();
+    const price = Number(document.getElementById("new-product-price").value);
+    const image = document.getElementById("new-product-image").value.trim();
+
+    if (!name || !Number.isInteger(price) || price < 0) {
+      status.textContent = "Enter a product name and a valid whole-number price.";
+      return;
+    }
+
+    const { error } = await supabaseClient
+      .from("products")
+      .insert({
+        name: name,
+        description: description,
+        price_inr: price,
+        image_url: image || null,
+        in_stock: true
+      });
+
+    if (error) {
+      status.textContent = "Could not add product. Check owner access.";
+      return;
+    }
+
+    status.textContent = "Product added successfully!";
+
+    document.getElementById("new-product-name").value = "";
+    document.getElementById("new-product-description").value = "";
+    document.getElementById("new-product-price").value = "";
+    document.getElementById("new-product-image").value = "";
+
+    await loadOwnerProducts();
+  }
+
+  async function checkExistingSession() {
+    const { data } = await supabaseClient.auth.getSession();
+
+    if (data.session) {
+      document.getElementById("login-panel").classList.add("hidden");
+      document.getElementById("owner-dashboard").classList.remove("hidden");
+      await loadOwnerProducts();
+    }
+  }
+
+  checkExistingSession();
+</script>
+
+</body>
+</html>

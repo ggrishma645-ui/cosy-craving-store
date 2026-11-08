@@ -423,16 +423,18 @@ nav a {
   <a href="owner.html">Owner</a>
 </nav>
 </header>
+  <main>
+  <section id="addons">
+    <h2 class="section-title">Little Extras ♡</h2>
+    <p class="subtitle">Add a little something special to your box.</p>
 
+    <p id="loading" class="subtitle">Loading our add-ons...</p>
 
+    <div class="products" id="products"></div>
 
-<section id="shop">
-  <h2 class="section-title">Our Little Collection ♡</h2>
-  <p class="subtitle">Find something special for every mood.</p>
-  <p id="loading" class="subtitle">Loading our collection...</p>
-  <div class="products" id="products"></div>
-  <p id="product-error" class="subtitle"></p>
-</section>
+    <p id="product-error" class="subtitle"></p>
+  </section>
+</main>
 
 <section id="custom">
   <div class="feature">
@@ -650,7 +652,6 @@ add.addEventListener("click", () => {
 quantityControl.className = "quantity-control";
 quantityControl.style.display = "none";
 quantityControl.style.marginTop = "10px";
-quantityControl.style.display = "flex";
 quantityControl.style.alignItems = "center";
 quantityControl.style.justifyContent = "center";
 quantityControl.style.gap = "12px";
@@ -809,11 +810,13 @@ function addToCart(id) {
   ];
 
   const hasBox = cart.some(item =>
-    boxNames.includes(item.name)
-  );
+  boxNames.some(boxName =>
+    item.name === boxName || item.name.startsWith(boxName + " + Extras")
+  )
+);
 
   if (!hasBox) {
-    alert("Please add a Cosy Craving box before choosing add-ons! ♡");
+    alert("Please add a Cozy Craving box before choosing add-ons! ♡");
     return;
   }
 
@@ -1108,26 +1111,8 @@ async function addOwnerProduct() {
   });
 }
   updateCart();
+  loadProducts();
 </script>
-  <div id="customization-modal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <button type="button" class="btn secondary" onclick="closeCustomization()">Close ✕</button>
-
-    <h2>Customize Your Box ♡</h2>
-    <p>Choose your little extras:</p>
-
-    <div id="customization-options"></div>
-
-    <label for="custom-note">Personal note (optional)</label>
-    <textarea id="custom-note" rows="3"
-      placeholder="Write a sweet little message..."></textarea>
-
-    <p id="customization-total">Extras total: ₹0</p>
-
-    <button type="button" class="btn" onclick="addCustomizedBox()">
-      Add customized box ♡
-    </button>
-  </div>
-</div>
+  
 </body>
 </html>
